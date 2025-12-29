@@ -9,9 +9,6 @@
     "webNavigation",
     "tabs"
   ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
   "action": {
     "default_popup": "pages/popup.html",
     "default_icon": "assets/icon.png"
