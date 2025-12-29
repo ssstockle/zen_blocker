@@ -76,7 +76,6 @@ function hideBlockOverlay() {
 function updateBlockTimer() {
     const remaining = blockedUntil - Date.now();
     if (remaining <= 0) {
-        // Block expired, reset everything
         hideBlockOverlay();
         currentRetries = 0;
         saveBlockState();
@@ -120,7 +119,6 @@ async function handleRetry() {
     updateRetriesDisplay();
 
     if (currentRetries >= MAX_RETRIES) {
-        // Block the user
         blockedUntil = Date.now() + BLOCK_DURATION;
         await saveBlockState();
         showBlockOverlay();
