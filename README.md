@@ -36,7 +36,7 @@ _How calming is that?_
 - Easy to add or remove sites from your block list
 - Works instantly after adding sites
 
-> **Warning**
+> [!WARNING]  
 > If you fail three times, you will get blocked for 20 mins by default, not only for the page you were trying to access,
 > but for
 > all blocked pages. This is to help you build discipline and resist the urge to visit distracting sites (I'm talking to
@@ -50,7 +50,7 @@ _How calming is that?_
 
 #### Install from source
 
-> **Note**
+> [!NOTE]
 > I actually paid $5 just to have this extension published on the Chrome Web Store, you can get it from there if you
 > want to
 > make Google happy, but if you want to avoid that, just install it from source following the steps below.
