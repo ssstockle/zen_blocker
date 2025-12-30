@@ -188,7 +188,7 @@ function updateStats(typed) {
     elements.accuracy.textContent = total ? `${Math.round((stats.correct / total) * 100)}%` : "100%";
 }
 
-function checkSuccess(typed) {
+async function checkSuccess(typed) {
     if (normalizeText(typed) !== targetChallenge) return;
 
     clearInterval(timerIntervalId);
@@ -197,7 +197,7 @@ function checkSuccess(typed) {
     elements.input.disabled = true;
 
     currentRetries = 0;
-    saveBlockState();
+    await saveBlockState();
 
     const originalUrl = new URLSearchParams(window.location.search).get("url");
     if (!originalUrl) return setTimeout(() => history.back(), 800);
@@ -206,11 +206,11 @@ function checkSuccess(typed) {
     setTimeout(() => window.location.href = originalUrl, 800);
 }
 
-function handleInput(e) {
+async function handleInput(e) {
     const typed = e.target.value;
     renderFeedback(typed);
     updateStats(typed);
-    checkSuccess(typed);
+    await checkSuccess(typed);
 }
 
 elements.input.addEventListener("input", handleInput);
