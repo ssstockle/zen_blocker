@@ -55,7 +55,7 @@ _How calming is that?_
 > want to
 > make Google happy, but if you want to avoid that, just install it from source following the steps below.
 
-1. Download or clone this repository
+1. Download the .zip from the releases tab or clone this repository.
 2. Open Chrome and navigate to `chrome://extensions/` (or your Chromium-based browser's extensions page)
 3. Enable "Developer mode" in the top right corner
 4. Click "Load unpacked" and select the extension folder
@@ -66,6 +66,11 @@ _How calming is that?_
 1. Click the Zen Blocker icon in your browser toolbar
 2. Add websites you want to block (e.g., `twitter.com`, `reddit.com`)
 3. Try to visit those sites and experience zen instead
+
+#### Example
+```plaintext
+x.com;instagram.com;twitter.com;youtube.com;twitch.tv;kick.com;tiktok.com
+```
 
 ## Contribute
 
