@@ -23,10 +23,9 @@ let BLOCK_DURATION = 15 * 60 * 1000;
 
 let targetChallenge = "";
 let author = "";
-let timeoutId = null;
 let timerIntervalId = null;
 let blockTimerIntervalId = null;
-let timeRemaining = 0;
+let timerEndTime = 0;
 let currentRetries = 0;
 let blockedUntil = 0;
 
@@ -40,8 +39,12 @@ function normalizeText(text) {
         .trim();
 }
 
+function getTimeRemaining() {
+    return Math.max(0, timerEndTime - Date.now());
+}
+
 function updateTimerDisplay() {
-    const seconds = Math.ceil(timeRemaining / 1000);
+    const seconds = Math.ceil(getTimeRemaining() / 1000);
     elements.timer.textContent = `${seconds}s`;
     elements.timer.classList.toggle("warning", seconds <= 10);
 }
@@ -113,6 +116,18 @@ async function saveBlockState() {
     });
 }
 
+async function saveChallengeState() {
+    await chrome.storage.local.set({
+        challengeText: targetChallenge,
+        challengeAuthor: author,
+        timerEndTime: timerEndTime
+    });
+}
+
+async function clearChallengeState() {
+    await chrome.storage.local.remove(["challengeText", "challengeAuthor", "timerEndTime"]);
+}
+
 async function handleRetry() {
     currentRetries++;
     await saveBlockState();
@@ -127,18 +142,23 @@ async function handleRetry() {
     return false;
 }
 
-function startTimer() {
-    clearTimeout(timeoutId);
+function startTimer(resumeEndTime = null) {
     clearInterval(timerIntervalId);
 
-    timeRemaining = MAX_TIME_TO_SOLVE;
+    if (resumeEndTime && resumeEndTime > Date.now()) {
+        timerEndTime = resumeEndTime;
+    } else {
+        timerEndTime = Date.now() + MAX_TIME_TO_SOLVE;
+    }
+
+    saveChallengeState();
     updateTimerDisplay();
 
     timerIntervalId = setInterval(async () => {
-        timeRemaining -= 1000;
         updateTimerDisplay();
-        if (timeRemaining <= 0) {
+        if (getTimeRemaining() <= 0) {
             clearInterval(timerIntervalId);
+            await clearChallengeState();
             const blocked = await handleRetry();
             if (!blocked) {
                 resetChallenge();
@@ -147,10 +167,15 @@ function startTimer() {
     }, 1000);
 }
 
-function resetChallenge() {
-    const randomQuote = getRandomQuote();
-    targetChallenge = normalizeText(randomQuote.text);
-    author = randomQuote.author;
+function resetChallenge(existingChallenge = null, existingAuthor = null, existingTimerEnd = null) {
+    if (existingChallenge && existingAuthor) {
+        targetChallenge = existingChallenge;
+        author = existingAuthor;
+    } else {
+        const randomQuote = getRandomQuote();
+        targetChallenge = normalizeText(randomQuote.text);
+        author = randomQuote.author;
+    }
 
     elements.challengeDisplay.textContent = targetChallenge;
     elements.authorDisplay.textContent = `- ${author}`;
@@ -162,7 +187,7 @@ function resetChallenge() {
     updateStats("");
     elements.input.focus();
 
-    startTimer();
+    startTimer(existingTimerEnd);
 }
 
 function renderFeedback(typed) {
@@ -198,9 +223,19 @@ async function checkSuccess(typed) {
 
     currentRetries = 0;
     await saveBlockState();
+    await clearChallengeState();
 
     const originalUrl = new URLSearchParams(window.location.search).get("url");
-    if (!originalUrl) return setTimeout(() => history.back(), 800);
+    if (!originalUrl) {
+        setTimeout(() => {
+            if (window.history.length > 1) {
+                history.back();
+            } else {
+                window.close();
+            }
+        }, 800);
+        return;
+    }
 
     chrome.runtime.sendMessage({type: "allowRedirect", url: originalUrl});
     setTimeout(() => window.location.href = originalUrl, 800);
@@ -220,7 +255,14 @@ async function init() {
     const isBlocked = await checkBlockStatus();
     updateRetriesDisplay();
     if (!isBlocked) {
-        resetChallenge();
+        const data = await chrome.storage.local.get(["challengeText", "challengeAuthor", "timerEndTime"]);
+
+        if (data.challengeText && data.challengeAuthor && data.timerEndTime > Date.now()) {
+            resetChallenge(data.challengeText, data.challengeAuthor, data.timerEndTime);
+        } else {
+            await clearChallengeState();
+            resetChallenge();
+        }
     }
 }
 

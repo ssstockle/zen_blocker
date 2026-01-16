@@ -1,7 +1,7 @@
 {
   "name": "Zen Blocker",
   "description": "You will regret wanting to doomscroll",
-  "version": "1.0",
+  "version": "1.1.0",
   "manifest_version": 3,
   "homepage_url": "https://github.com/ssstockle",
   "permissions": [

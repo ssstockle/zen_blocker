@@ -51,9 +51,9 @@ _How calming is that?_
 #### Install from source
 
 > [!NOTE]
-> I actually paid $5 just to have this extension published on the Chrome Web Store, you can get it from there if you
-> want to
-> make Google happy, but if you want to avoid that, just install it from source following the steps below.
+> I actually paid $5 just to have this extension published on the Chrome Web Store (_small update: they rejected it because of permissions, 
+> I didn't re-apply, so go and grab your free .zip here for now hehe_), you ~~can~~ get it from there if you
+> want to make Google happy, but if you want to avoid that, just install it from source following the steps below.
 
 1. Download the .zip from the releases tab or clone this repository.
 2. Open Chrome and navigate to `chrome://extensions/` (or your Chromium-based browser's extensions page)
